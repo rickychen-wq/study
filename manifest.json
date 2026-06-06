@@ -1,0 +1,17 @@
+{
+  "name": "CHEN.SYS Study OS",
+  "short_name": "CHEN.SYS",
+  "description": "Chen's personal study & workout tracker",
+  "start_url": "./mobile.html",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23080808'/><text x='50%' y='55%' font-size='100' text-anchor='middle' dominant-baseline='middle' fill='%23c9a84c'>⚡</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
