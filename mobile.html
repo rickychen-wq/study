@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="CHEN.SYS">
+<meta name="theme-color" content="#080808">
+<link rel="manifest" href="manifest.json">
+<title>CHEN.SYS · Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDhUAusuPzJaCMR4rrXiz2cCmvDPIxOARc",
+    authDomain: "chen-study-app.firebaseapp.com",
+    projectId: "chen-study-app",
+    storageBucket: "chen-study-app.firebasestorage.app",
+    messagingSenderId: "830576972073",
+    appId: "1:830576972073:web:9ba49dc1d5a4c498712738"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+  window._firestore = { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot };
+  window._dbReady = true;
+  window.dispatchEvent(new Event('dbReady'));
+</script>
+<style>
+:root {
+  --bg: #080808;
+  --bg2: #0e0e0e;
+  --gold: #c9a84c;
+  --gold2: #f0d080;
+  --gold3: #8a6820;
+  --gold-glow: rgba(201,168,76,0.3);
+  --border: rgba(201,168,76,0.25);
+  --border2: rgba(201,168,76,0.08);
+  --text: #e8dcc8;
+  --muted: #6a5e42;
+  --green: #39ff14;
+  --blue: #00cfff;
+  --card: rgba(201,168,76,0.04);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* scanlines */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:9999;
+  pointer-events:none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 6px);
+}
+
+/* ─── HEADER ─── */
+#header {
+  position:sticky; top:0; z-index:100;
+  padding:14px 18px 10px;
+  background: rgba(8,8,8,0.95);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  display:flex; justify-content:space-between; align-items:center;
+}
+
+#m-logo {
+  font-family:'Orbitron', sans-serif;
+  font-size:16px;
+  font-weight:900;
+  color:var(--gold2);
+  text-shadow:0 0 15px var(--gold);
+  letter-spacing:2px;
+}
+
+#m-clock {
+  font-family:'Orbitron', sans-serif;
+  font-size:13px;
+  color:var(--gold);
+  text-shadow:0 0 8px var(--gold);
+  letter-spacing:2px;
+}
+
+/* ─── GREETING ─── */
+#m-greeting {
+  padding:16px 18px 8px;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:2px;
+}
+
+/* ─── NAV TABS ─── */
+#bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  display:flex;
+  background:rgba(8,8,8,0.97);
+  border-top:1px solid var(--border);
+  z-index:200;
+  backdrop-filter:blur(10px);
+}
+
+.nav-btn {
+  flex:1; background:none; border:none; cursor:pointer;
+  padding:12px 0;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  color:var(--muted);
+  font-family:'Share Tech Mono', monospace;
+  font-size:8px; letter-spacing:1px;
+  text-transform:uppercase;
+  transition:all 0.2s;
+}
+
+.nav-btn .nav-icon { font-size:20px; }
+.nav-btn.active { color:var(--gold); }
+.nav-btn.active .nav-icon { filter:drop-shadow(0 0 6px var(--gold)); }
+
+/* ─── PAGE ─── */
+.page { display:none; padding:12px 16px; }
+.page.active { display:block; }
+
+/* ─── SECTION TITLE ─── */
+.sec-title {
+  font-family:'Orbitron', sans-serif;
+  font-size:9px;
+  color:var(--gold);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex; align-items:center; gap:8px;
+}
+.sec-title::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ─── CARD ─── */
+.m-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:14px;
+  margin-bottom:14px;
+  position:relative;
+}
+.m-card::before {
+  content:'';
+  position:absolute; top:0; left:20px; right:20px; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold3), transparent);
+}
+
+/* ─── QUICK STATS ─── */
+#stats-row {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; margin-bottom:16px;
+}
+
+.stat-m {
+  border:1px solid var(--border2);
+  padding:12px;
+  text-align:center;
+}
+
+.stat-m-val {
+  font-family:'Orbitron', sans-serif;
+  font-size:20px;
+  color:var(--gold2);
+  text-shadow:0 0 10px var(--gold);
+}
+.stat-m-label { font-size:8px; color:var(--muted); letter-spacing:2px; margin-top:3px; }
+
+/* ─── WORKOUT STATUS ─── */
+#workout-status-row {
+  display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;
+}
+
+.w-dot {
+  font-size:10px; padding:4px 10px;
+  border:1px solid var(--border2);
+  color:var(--muted); letter-spacing:1px;
+}
+.w-dot.done { border-color:var(--blue); color:var(--blue); }
+
+/* ─── TODO ITEM ─── */
+.m-todo {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border:1px solid var(--border2);
+  margin-bottom:8px;
+  background:rgba(201,168,76,0.02);
+  transition:all 0.2s;
+}
+
+.m-todo.done-item { opacity:0.35; }
+.m-todo.done-item .m-todo-title { text-decoration:line-through; }
+
+.m-todo-badge {
+  font-size:8px; padding:2px 6px;
+  border:1px solid var(--gold3);
+  color:var(--gold); letter-spacing:1px;
+  white-space:nowrap; flex-shrink:0;
+}
+
+.m-todo-title { flex:1; font-size:12px; color:var(--text); line-height:1.4; }
+
+.m-check-btn {
+  background:none; border:1px solid var(--green);
+  color:var(--green); font-size:14px;
+  width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0;
+  transition:all 0.15s;
+}
+.m-check-btn:active { background:var(--green); color:#000; }
+.m-check-btn.undone-btn { border-color:var(--muted); color:var(--muted); }
+
+/* ─── ADD FORM ─── */
+#add-form {
+  display:flex; flex-direction:column; gap:10px;
+  margin-bottom:16px;
+}
+
+.m-inp {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:'Share Tech Mono', monospace;
+  font-size:13px;
+  padding:10px 14px;
+  outline:none;
+  width:100%;
+}
+.m-inp:focus { border-color:var(--gold); }
+.m-inp::placeholder { color:var(--muted); }
+
+.m-select {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  padding:10px 14px;
+  outline:none;
+  width:100%;
+}
+.m-select option { background:#111; }
+
+.m-btn {
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  padding:12px;
+  cursor:pointer; letter-spacing:2px;
+  text-align:center;
+  transition:all 0.2s;
+  width:100%;
+}
+.m-btn:active { background:var(--gold); color:#000; }
+
+/* ─── PENDING COUNT BADGE ─── */
+.pending-badge {
+  background:var(--gold);
+  color:#000;
+  font-size:9px;
+  font-weight:700;
+  width:16px; height:16px;
+  border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  position:absolute; top:6px; right:8px;
+}
+
+/* ─── PROGRESS BAR ─── */
+.prog-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.prog-label { font-size:10px; color:var(--text); min-width:36px; }
+.prog-wrap { flex:1; height:4px; background:var(--border2); border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg, var(--gold3), var(--gold2)); border-radius:2px; transition:width 0.5s; }
+.prog-time { font-size:9px; color:var(--gold); min-width:36px; text-align:right; font-family:'Orbitron',sans-serif; }
+
+.no-tasks { color:var(--muted); font-size:11px; text-align:center; padding:24px; letter-spacing:2px; }
+
+/* ─── SECTION SPACING ─── */
+.page-section { margin-bottom:20px; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="m-logo">CHEN.SYS</div>
+  <div id="m-clock">--:--</div>
+</div>
+
+<div id="m-greeting">// LOADING...</div>
+
+<!-- ═══ PAGES ═══ -->
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+
+  <div id="stats-row">
+    <div class="stat-m">
+      <div class="stat-m-val" id="m-stat-today">0m</div>
+      <div class="stat-m-label">TODAY</div>
+    </div>
+    <div class="stat-m">
+      <div class="stat-m-val" id="m-stat-pending">0</div>
+      <div class="stat-m-label">PENDING</div>
+    </div>
+  </div>
+
+  <div class="sec-title">Today's Progress</div>
+  <div class="m-card">
+    <div id="m-today-subs"></div>
+  </div>
+
+  <div class="sec-title">Workout</div>
+  <div class="m-card">
+    <div id="m-workout-status"></div>
+  </div>
+
+</div>
+
+<!-- TASKS -->
+<div id="page-tasks" class="page">
+
+  <div class="sec-title">Add Task</div>
+  <div id="add-form">
+    <select class="m-select" id="m-sub-sel">
+      <option value="">選擇科目</option>
+    </select>
+    <input class="m-inp" id="m-task-inp" placeholder="輸入任務名稱..." >
+    <button class="m-btn" onclick="mAddTodo()">＋ ADD TASK</button>
+  </div>
+
+  <div class="sec-title">Today's Tasks</div>
+  <div id="m-todo-list"></div>
+
+</div>
+
+<!-- HISTORY -->
+<div id="page-history" class="page">
+  <div class="sec-title">History</div>
+  <div id="m-history-list"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="nav-btn active" onclick="mSwitchPage('home', this)">
+    <span class="nav-icon">⚡</span>
+    <span>HOME</span>
+  </button>
+  <button class="nav-btn" onclick="mSwitchPage('tasks', this)" style="position:relative;">
+    <span class="nav-icon">📋</span>
+    <span>TASKS</span>
+    <span class="pending-badge" id="pending-badge" style="display:none;"></span>
+  </button>
+  <button class="nav-btn" onclick="mSwitchPage('history', this)">
+    <span class="nav-icon">🗂</span>
+    <span>LOG</span>
+  </button>
+</div>
+
+<script>
+const TAIWAN_TZ = 'Asia/Taipei';
+const WORKOUT_DAYS = [0,1,3,5];
+const WORKOUT_LIST = [
+  { id:'w1', name:'伏地挺身', sets:'3×10', icon:'💪' },
+  { id:'w2', name:'深蹲',     sets:'3×15', icon:'🦵' },
+  { id:'w3', name:'捲腹',     sets:'3×15', icon:'🔥' },
+  { id:'w4', name:'棒式',     sets:'3×30s', icon:'⚡' },
+];
+
+let state = {
+  subjects: ['國文','英文','數學','歷史','公民','地科','物理'],
+  todos: [],
+  history: [],
+  workoutDone: {},
+};
+
+function getTodayKey() {
+  const now = new Date();
+  const tw = new Date(now.toLocaleString('en-US', { timeZone: TAIWAN_TZ }));
+  return `${tw.getFullYear()}-${String(tw.getMonth()+1).padStart(2,'0')}-${String(tw.getDate()).padStart(2,'0')}`;
+}
+
+// ─── CLOCK ───
+function startClock() {
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+function updateClock() {
+  const now = new Date();
+  const tw = new Date(now.toLocaleString('en-US', { timeZone: TAIWAN_TZ }));
+  const hh = String(tw.getHours()).padStart(2,'0');
+  const mm = String(tw.getMinutes()).padStart(2,'0');
+  document.getElementById('m-clock').textContent = `${hh}:${mm}`;
+}
+
+function getGreeting() {
+  const now = new Date();
+  const tw = new Date(now.toLocaleString('en-US', { timeZone: TAIWAN_TZ }));
+  const h = tw.getHours();
+  if (h >= 5 && h < 12)  return 'GOOD MORNING, CHEN 🌅';
+  if (h >= 12 && h < 17) return 'GOOD AFTERNOON, CHEN ☀️';
+  if (h >= 17 && h < 21) return 'GOOD EVENING, CHEN 🌆';
+  return 'GOOD NIGHT, CHEN 🌙';
+}
+
+// ─── FIREBASE ───
+function waitForDB(cb) {
+  if (window._dbReady) { cb(); return; }
+  window.addEventListener('dbReady', () => cb(), { once:true });
+}
+
+async function loadData(cb) {
+  const { doc, getDoc, collection, getDocs, query, orderBy } = window._firestore;
+  const db = window._db;
+  try {
+    const subDoc = await getDoc(doc(db, 'config', 'subjects'));
+    if (subDoc.exists()) state.subjects = subDoc.data().list;
+
+    const todosSnap = await getDocs(collection(db, 'todos'));
+    state.todos = [];
+    todosSnap.forEach(d => state.todos.push({ id:d.id, ...d.data() }));
+
+    const histSnap = await getDocs(query(collection(db, 'history'), orderBy('timestamp','desc')));
+    state.history = [];
+    histSnap.forEach(d => state.history.push({ id:d.id, ...d.data() }));
+
+    const wDoc = await getDoc(doc(db, 'workout', getTodayKey()));
+    if (wDoc.exists()) state.workoutDone = wDoc.data();
+  } catch(e) { console.error(e); }
+  cb();
+}
+
+async function saveTodo(todo) {
+  const { doc, setDoc } = window._firestore;
+  await setDoc(doc(window._db, 'todos', todo.id), todo);
+}
+
+// ─── ADD TODO ───
+async function mAddTodo() {
+  const sub = document.getElementById('m-sub-sel').value;
+  const title = document.getElementById('m-task-inp').value.trim();
+  if (!title) return;
+
+  const todo = {
+    id: 'todo_' + Date.now(),
+    title,
+    subject: sub || '其他',
+    done: false,
+    elapsed: 0,
+    date: getTodayKey(),
+    createdAt: Date.now(),
+  };
+
+  state.todos.push(todo);
+  await saveTodo(todo);
+  document.getElementById('m-task-inp').value = '';
+  renderAll();
+}
+
+async function mToggleDone(id) {
+  const t = state.todos.find(x=>x.id===id);
+  if (!t) return;
+  t.done = !t.done;
+  await saveTodo(t);
+  renderAll();
+}
+
+// ─── RENDER ───
+function renderAll() {
+  renderSelect();
+  renderTodos();
+  renderHome();
+  renderHistory();
+  updatePendingBadge();
+}
+
+function renderSelect() {
+  const sel = document.getElementById('m-sub-sel');
+  sel.innerHTML = '<option value="">選擇科目</option>' +
+    state.subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
+function renderTodos() {
+  const el = document.getElementById('m-todo-list');
+  const today = getTodayKey();
+  const todayTodos = state.todos.filter(t => t.date === today);
+
+  if (!todayTodos.length) {
+    el.innerHTML = '<div class="no-tasks">[ NO TASKS TODAY ]</div>';
+    return;
+  }
+
+  // Sort: undone first
+  const sorted = [...todayTodos].sort((a,b) => (a.done===b.done ? 0 : a.done ? 1 : -1));
+
+  el.innerHTML = sorted.map(t => `
+    <div class="m-todo ${t.done?'done-item':''}">
+      <div class="m-todo-badge">${t.subject}</div>
+      <div class="m-todo-title">${escHtml(t.title)}</div>
+      <button class="m-check-btn ${t.done?'undone-btn':''}" onclick="mToggleDone('${t.id}')">
+        ${t.done ? '↩' : '✓'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function renderHome() {
+  const today = getTodayKey();
+
+  // Stats
+  const todaySecs = state.history.filter(h=>h.date===today).reduce((s,h)=>s+(h.duration||0),0);
+  const pending = state.todos.filter(t=>t.date===today&&!t.done).length;
+  document.getElementById('m-stat-today').textContent = fmtMinutes(todaySecs);
+  document.getElementById('m-stat-pending').textContent = pending;
+
+  // Today subjects
+  const subTimes = {};
+  state.history.filter(h=>h.date===today).forEach(h => {
+    subTimes[h.subject] = (subTimes[h.subject]||0) + (h.duration||0);
+  });
+  const maxTime = Math.max(...Object.values(subTimes), 1);
+  const subEl = document.getElementById('m-today-subs');
+
+  if (!Object.keys(subTimes).length) {
+    subEl.innerHTML = '<div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-align:center;padding:12px;">NO STUDY DATA YET</div>';
+  } else {
+    subEl.innerHTML = Object.entries(subTimes)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([sub,secs]) => `
+        <div class="prog-row">
+          <div class="prog-label">${sub}</div>
+          <div class="prog-wrap">
+            <div class="prog-fill" style="width:${Math.round(secs/maxTime*100)}%"></div>
+          </div>
+          <div class="prog-time">${fmtMinutes(secs)}</div>
+        </div>
+      `).join('');
+  }
+
+  // Workout
+  const wEl = document.getElementById('m-workout-status');
+  const isWorkoutDay = WORKOUT_DAYS.includes(new Date(new Date().toLocaleString('en-US',{timeZone:TAIWAN_TZ})).getDay());
+
+  if (!isWorkoutDay) {
+    wEl.innerHTML = '<div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-align:center;padding:8px;">REST DAY 💤</div>';
+  } else {
+    const doneCount = WORKOUT_LIST.filter(w=>state.workoutDone[w.id]).length;
+    wEl.innerHTML = `
+      <div style="font-size:10px;color:var(--blue);letter-spacing:1px;margin-bottom:10px;">TRAINING DAY — ${doneCount}/${WORKOUT_LIST.length}</div>
+      ${WORKOUT_LIST.map(w => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span>${w.icon}</span>
+          <span style="flex:1;font-size:12px;color:${state.workoutDone[w.id]?'var(--muted)':'var(--text)'};${state.workoutDone[w.id]?'text-decoration:line-through':''}">${w.name}</span>
+          <span style="font-size:10px;color:var(--muted);">${w.sets}</span>
+          <span style="font-size:14px;color:${state.workoutDone[w.id]?'var(--green)':'var(--muted)'};">${state.workoutDone[w.id]?'✓':'○'}</span>
+        </div>
+      `).join('')}
+    `;
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById('m-history-list');
+  if (!state.history.length) {
+    el.innerHTML = '<div class="no-tasks">[ NO HISTORY YET ]</div>';
+    return;
+  }
+
+  const grouped = {};
+  state.history.slice(0,60).forEach(h => {
+    if (!grouped[h.date]) grouped[h.date] = [];
+    grouped[h.date].push(h);
+  });
+
+  el.innerHTML = Object.entries(grouped)
+    .sort((a,b)=>b[0].localeCompare(a[0]))
+    .map(([date, items]) => `
+      <div style="margin-bottom:16px;">
+        <div style="font-size:9px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);">// ${date}</div>
+        ${items.map(h => `
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border2);margin-bottom:6px;background:rgba(201,168,76,0.02);">
+            <div style="flex:1;">
+              <div style="font-size:12px;color:var(--text);">${escHtml(h.title)}</div>
+              <div style="font-size:9px;color:var(--gold3);margin-top:2px;letter-spacing:1px;">${h.subject}</div>
+            </div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);">${fmtSeconds(h.duration||0)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+}
+
+function updatePendingBadge() {
+  const today = getTodayKey();
+  const count = state.todos.filter(t=>t.date===today&&!t.done).length;
+  const badge = document.getElementById('pending-badge');
+  if (count > 0) { badge.textContent = count; badge.style.display='inline-flex'; }
+  else badge.style.display='none';
+}
+
+// ─── NAV ───
+function mSwitchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── UTILS ───
+function fmtSeconds(s) {
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  if (s >= 3600) return `${Math.floor(s/3600)}h${String(m%60).padStart(2,'0')}m`;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function fmtMinutes(s) {
+  const m = Math.floor(s/60);
+  if (m >= 60) return `${(m/60).toFixed(1)}h`;
+  return `${m}m`;
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── INIT ───
+window.addEventListener('load', () => {
+  startClock();
+  document.getElementById('m-greeting').textContent = `// ${getGreeting()}`;
+  waitForDB(() => {
+    loadData(() => renderAll());
+  });
+});
+</script>
+</body>
+</html>
