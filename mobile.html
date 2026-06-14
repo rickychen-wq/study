@@ -21,6 +21,7 @@
 :root{
   --bg:#06060a;--bg2:#0e0e10;
   --gold:#c9a84c;--gold2:#f0d47a;--gold3:#7a5c1e;
+  --glow:rgba(201,168,76,.4);--glow2:rgba(201,168,76,.15);
   --border:rgba(201,168,76,.22);--border2:rgba(201,168,76,.07);
   --text:#ede0c4;--text2:#b0a080;--muted:#5a4e36;--card:rgba(201,168,76,.03);
 }
@@ -36,11 +37,20 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
 #mgreet{padding:10px 16px 4px;font-size:10px;color:var(--muted);letter-spacing:2px;}
 
 /* EXAM BANNER */
-#exam-banner{margin:8px 16px;padding:8px 14px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;}
-#exam-banner::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanl 4s linear infinite;}
+#exbanner{margin:8px 16px;padding:8px 14px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;}
+#exbanner::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanl 4s linear infinite;}
 @keyframes scanl{to{left:200%;}}
 #exdays{font-family:'Orbitron',sans-serif;font-size:22px;color:var(--gold2);text-shadow:0 0 12px var(--gold);}
 #exinfo{font-size:9px;color:var(--muted);letter-spacing:2px;line-height:1.6;}
+
+/* ACTIVE TIMER BAR */
+#atbar{display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--gold);background:rgba(201,168,76,.05);position:relative;overflow:hidden;animation:pglow 2s ease-in-out infinite;}
+@keyframes pglow{0%,100%{box-shadow:0 0 8px var(--glow);}50%{box-shadow:0 0 20px var(--glow);}}
+#atbar::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);animation:scanl 2.5s linear infinite;}
+#at-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+#at-name{font-size:11px;color:var(--gold2);letter-spacing:1px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#at-disp{font-family:'Orbitron',sans-serif;font-size:28px;color:var(--gold2);text-shadow:0 0 20px var(--gold);letter-spacing:4px;text-align:center;margin-bottom:10px;}
+#at-btns{display:flex;gap:8px;}
 
 /* NAV */
 #bnav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(6,6,10,.97);border-top:1px solid var(--border);z-index:200;backdrop-filter:blur(12px);}
@@ -77,24 +87,31 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
 .bt{font-size:9px;color:var(--gold);font-family:'Orbitron',sans-serif;min-width:34px;text-align:right;}
 
 /* TODO */
-.td{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--border2);margin-bottom:7px;background:rgba(201,168,76,.02);transition:all .2s;position:relative;}
-.td::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold3);}
+.td{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--border2);margin-bottom:7px;background:rgba(201,168,76,.02);transition:all .2s;position:relative;}
+.td::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold3);transition:background .2s;}
+.td.timing{border-color:var(--gold);background:rgba(201,168,76,.06);box-shadow:0 0 12px var(--glow2);}
+.td.timing::before{background:var(--gold2);}
 .td.dn{opacity:.3;}.td.dn .ttl{text-decoration:line-through;}
 .td.ov::before{background:#b05818;}
 .tbg{font-size:8px;padding:2px 5px;border:1px solid var(--gold3);color:var(--gold);letter-spacing:1px;white-space:nowrap;flex-shrink:0;}
 .ovtg{font-size:8px;padding:1px 4px;border:1px solid #b05818;color:#b05818;letter-spacing:1px;flex-shrink:0;}
 .ttl{flex:1;font-size:12px;color:var(--text);line-height:1.4;}
-.ckbtn{background:none;border:1px solid var(--gold);color:var(--gold);font-size:13px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;border-radius:2px;}
-.ckbtn:active{background:var(--gold);color:#000;}
-.ckbtn.un{border-color:var(--muted);color:var(--muted);}
+.telp{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--gold);white-space:nowrap;flex-shrink:0;}
+.tbtns{display:flex;gap:4px;flex-shrink:0;}
+
+/* BTNS */
+.btn{background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 12px;cursor:pointer;letter-spacing:1px;transition:all .2s;white-space:nowrap;}
+.btn:active{background:rgba(201,168,76,.15);}
+.btng{border-color:var(--gold);color:var(--gold);}
+.btng:active{background:var(--gold);color:#000;}
+.btnstop{border-color:rgba(201,168,76,.3);color:var(--text2);}
+.btnfull{width:100%;text-align:center;padding:12px;font-size:12px;letter-spacing:2px;}
 
 /* FORM */
 .inp{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px 13px;outline:none;width:100%;}
 .inp:focus{border-color:var(--gold);}
 .inp::placeholder{color:var(--muted);}
 select.inp{cursor:pointer;}select.inp option{background:#111;}
-.btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:12px;padding:12px;cursor:pointer;letter-spacing:2px;text-align:center;transition:all .2s;width:100%;}
-.btn:active{background:var(--gold);color:#000;}
 
 /* WORKOUT */
 .wo{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border2);margin-bottom:7px;background:rgba(201,168,76,.015);}
@@ -107,27 +124,36 @@ select.inp{cursor:pointer;}select.inp option{background:#111;}
 .hgl{font-size:8px;color:var(--gold);letter-spacing:3px;padding:5px 0;border-bottom:1px solid var(--border2);margin-bottom:7px;}
 .hi{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border2);margin-bottom:6px;background:var(--card);}
 .ht{flex:1;}.htitle{font-size:12px;color:var(--text);}.hsub{font-size:9px;color:var(--gold3);margin-top:2px;letter-spacing:1px;}
-.hd{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);}
+.hdur{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);}
 
 .nodata{color:var(--muted);font-size:11px;text-align:center;padding:20px;letter-spacing:2px;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div id="hd">
   <div id="mlogo">CHEN.SYS</div>
   <div id="mclk">--:--</div>
 </div>
 <div id="mgreet">// LOADING...</div>
 
-<!-- EXAM BANNER -->
-<div id="exam-banner">
+<div id="exbanner">
   <div id="exdays">--</div>
   <div id="exinfo">DAYS REMAINING<br>UNTIL 段考 (6/25)</div>
 </div>
 
-<!-- PAGES -->
+<!-- ACTIVE TIMER BAR (全頁顯示) -->
+<div id="atbar">
+  <div id="at-top">
+    <div style="font-size:9px;color:var(--muted);letter-spacing:3px;">// FOCUS ACTIVE</div>
+    <button class="btn btnstop" style="font-size:9px;padding:3px 8px;" onclick="stopT()">■ STOP</button>
+  </div>
+  <div id="at-name">--</div>
+  <div id="at-disp">00:00:00</div>
+  <div id="at-btns">
+    <button class="btn btng" style="flex:1;text-align:center;font-size:11px;" onclick="pauseT()" id="mpbtn">⏸ PAUSE</button>
+  </div>
+</div>
 
 <!-- HOME -->
 <div id="pg-home" class="pg active">
@@ -135,10 +161,8 @@ select.inp{cursor:pointer;}select.inp option{background:#111;}
     <div class="sc"><div class="sv" id="ms-today">0m</div><div class="sl">TODAY</div></div>
     <div class="sc"><div class="sv" id="ms-pend">0</div><div class="sl">PENDING</div></div>
   </div>
-
   <div class="st">Study Time</div>
   <div class="mc"><div id="msubs"></div></div>
-
   <div class="st">Workout</div>
   <div class="mc"><div id="mwo"></div></div>
 </div>
@@ -147,13 +171,10 @@ select.inp{cursor:pointer;}select.inp option{background:#111;}
 <div id="pg-tasks" class="pg">
   <div class="st">Add Task</div>
   <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">
-    <select class="inp" id="msel">
-      <option value="">選擇科目</option>
-    </select>
+    <select class="inp" id="msel"><option value="">選擇科目</option></select>
     <input class="inp" id="minp" placeholder="輸入任務名稱..." onkeydown="if(event.key==='Enter')addTodo()">
-    <button class="btn" onclick="addTodo()">＋ ADD TASK</button>
+    <button class="btn btng btnfull" onclick="addTodo()">＋ ADD TASK</button>
   </div>
-
   <div class="st">Today's Tasks</div>
   <div id="mtlist"></div>
 </div>
@@ -166,16 +187,9 @@ select.inp{cursor:pointer;}select.inp option{background:#111;}
 
 <!-- BOTTOM NAV -->
 <div id="bnav">
-  <button class="nbtn active" onclick="swpg('home',this)">
-    <span class="ni">⚡</span><span>HOME</span>
-  </button>
-  <button class="nbtn" onclick="swpg('tasks',this)" id="tasks-btn" style="position:relative;">
-    <span class="ni">📋</span><span>TASKS</span>
-    <span class="pbadge" id="pbadge" style="display:none;"></span>
-  </button>
-  <button class="nbtn" onclick="swpg('hist',this)">
-    <span class="ni">🗂</span><span>LOG</span>
-  </button>
+  <button class="nbtn active" onclick="swpg('home',this)"><span class="ni">⚡</span><span>HOME</span></button>
+  <button class="nbtn" onclick="swpg('tasks',this)" style="position:relative;"><span class="ni">📋</span><span>TASKS</span><span class="pbadge" id="pbadge" style="display:none;"></span></button>
+  <button class="nbtn" onclick="swpg('hist',this)"><span class="ni">🗂</span><span>LOG</span></button>
 </div>
 
 <script>
@@ -191,24 +205,17 @@ const WLIST=[
 
 let S={subjects:['國文','英文','數學','歷史','公民','地科','物理'],todos:[],history:[],workoutDone:{}};
 
+// timer state
+let aTimer=null,aId=null,aSec=0,aStartSec=0,aPaused=false;
+
 function twDate(){return new Date(new Date().toLocaleString('en-US',{timeZone:TZ}));}
 function dkey(d=null){const tw=d||twDate();return `${tw.getFullYear()}-${String(tw.getMonth()+1).padStart(2,'0')}-${String(tw.getDate()).padStart(2,'0')}`;}
 
-// CLOCK
 function startClk(){updClk();setInterval(updClk,1000);}
-function updClk(){
-  const tw=twDate();
-  document.getElementById('mclk').textContent=`${String(tw.getHours()).padStart(2,'0')}:${String(tw.getMinutes()).padStart(2,'0')}`;
-}
-
+function updClk(){const tw=twDate();document.getElementById('mclk').textContent=`${String(tw.getHours()).padStart(2,'0')}:${String(tw.getMinutes()).padStart(2,'0')}`;}
 function greet(){const h=twDate().getHours();return h>=5&&h<12?'GOOD MORNING, CHEN 🌅':h>=12&&h<17?'GOOD AFTERNOON, CHEN ☀️':h>=17&&h<21?'GOOD EVENING, CHEN 🌆':'GOOD NIGHT, CHEN 🌙';}
+function updExam(){function up(){const d=Math.ceil((EXAM-twDate())/864e5);document.getElementById('exdays').textContent=d>0?d:'0';}up();setInterval(up,60000);}
 
-function updExam(){
-  function up(){const d=Math.ceil((EXAM-twDate())/864e5);document.getElementById('exdays').textContent=d>0?d:'0';}
-  up();setInterval(up,60000);
-}
-
-// FIREBASE
 function waitDB(cb){if(window._dbReady){cb();return;}window.addEventListener('dbReady',()=>cb(),{once:true});}
 async function loadData(cb){
   const{doc,getDoc,collection,getDocs,query,orderBy}=window._fs,db=window._db;
@@ -217,25 +224,58 @@ async function loadData(cb){
     const ts=await getDocs(collection(db,'todos'));S.todos=[];ts.forEach(d=>S.todos.push({id:d.id,...d.data()}));
     const hs=await getDocs(query(collection(db,'history'),orderBy('timestamp','desc')));S.history=[];hs.forEach(d=>S.history.push({id:d.id,...d.data()}));
     const wd=await getDoc(doc(db,'workout',dkey()));if(wd.exists())S.workoutDone=wd.data();else S.workoutDone={};
-  }catch(e){console.error(e);}
-  cb();
+  }catch(e){console.error(e);}cb();
 }
 async function saveT(t){const{doc,setDoc}=window._fs;await setDoc(doc(window._db,'todos',t.id),t);}
+async function saveH(e){const{collection,addDoc}=window._fs;const r=await addDoc(collection(window._db,'history'),e);e.id=r.id;S.history.unshift(e);}
 
 // ADD TODO
 async function addTodo(){
-  const sub=document.getElementById('msel').value;
-  const title=document.getElementById('minp').value.trim();
+  const sub=document.getElementById('msel').value,title=document.getElementById('minp').value.trim();
   if(!title)return;
   const t={id:'t'+Date.now(),title,subject:sub||'其他',done:false,elapsed:0,date:dkey(),createdAt:Date.now(),overdue:false};
-  S.todos.push(t);await saveT(t);
-  document.getElementById('minp').value='';
+  S.todos.push(t);await saveT(t);document.getElementById('minp').value='';
   renderAll();
 }
 
 async function togDone(id){
   const t=S.todos.find(x=>x.id===id);if(!t)return;
+  if(aId===id)await stopT();
   t.done=!t.done;await saveT(t);renderAll();
+}
+
+// TIMER
+function startT(id){
+  if(aTimer)stopT();
+  aId=id;const t=S.todos.find(x=>x.id===id);
+  aSec=t.elapsed||0;aStartSec=aSec;aPaused=false;
+  document.getElementById('atbar').style.display='block';
+  document.getElementById('at-name').textContent=`${t.subject} — ${t.title}`;
+  document.getElementById('mpbtn').textContent='⏸ PAUSE';
+  aTimer=setInterval(()=>{
+    if(!aPaused){aSec++;document.getElementById('at-disp').textContent=fmt(aSec,true);}
+  },1000);
+  renderTodos();
+}
+
+async function stopT(){
+  if(!aTimer)return;
+  clearInterval(aTimer);aTimer=null;
+  const t=S.todos.find(x=>x.id===aId);
+  const dur=aSec-aStartSec; // 只記這次 session 的時間
+  if(t&&dur>5){
+    t.elapsed=aSec;await saveT(t);
+    await saveH({taskId:t.id,title:t.title,subject:t.subject,duration:dur,date:dkey(),timestamp:Date.now()});
+  }
+  aId=null;aSec=0;aStartSec=0;
+  document.getElementById('atbar').style.display='none';
+  document.getElementById('at-disp').textContent='00:00:00';
+  renderAll();
+}
+
+function pauseT(){
+  aPaused=!aPaused;
+  document.getElementById('mpbtn').textContent=aPaused?'▶ RESUME':'⏸ PAUSE';
 }
 
 // RENDER
@@ -251,31 +291,37 @@ function renderTodos(){
   if(!list.length){el.innerHTML='<div class="nodata">[ NO TASKS TODAY ]</div>';return;}
   const sorted=[...list].sort((a,b)=>a.done===b.done?0:a.done?1:-1);
   el.innerHTML=sorted.map(t=>`
-    <div class="td ${t.done?'dn':''} ${t.overdue&&!t.done?'ov':''}">
+    <div class="td ${t.done?'dn':''} ${aId===t.id?'timing':''} ${t.overdue&&!t.done?'ov':''}">
       <div class="tbg">${t.subject}</div>
       ${t.overdue&&!t.done?'<div class="ovtg">昨日</div>':''}
       <div class="ttl">${esc(t.title)}</div>
-      <button class="ckbtn ${t.done?'un':''}" onclick="togDone('${t.id}')">${t.done?'↩':'✓'}</button>
+      <div class="telp">${fmt(t.elapsed||0)}</div>
+      <div class="tbtns">
+        ${!t.done&&aId!==t.id?`<button class="btn btng" style="font-size:12px;padding:5px 9px;" onclick="startT('${t.id}')">▶</button>`:''}
+        ${aId===t.id?`<button class="btn btnstop" style="font-size:12px;padding:5px 9px;" onclick="stopT()">■</button>`:''}
+        <button class="btn ${t.done?'':'btng'}" style="font-size:12px;padding:5px 9px;" onclick="togDone('${t.id}')">${t.done?'↩':'✓'}</button>
+      </div>
     </div>`).join('');
 }
 
 function renderHome(){
   const today=dkey();
-  // stats
   const ts=S.history.filter(h=>h.date===today).reduce((s,h)=>s+(h.duration||0),0);
   const pnd=S.todos.filter(t=>t.date===today&&!t.done).length;
   document.getElementById('ms-today').textContent=fmtM(ts);
   document.getElementById('ms-pend').textContent=pnd;
-  // subs
+
   const sub={};
   S.history.filter(h=>h.date===today).forEach(h=>sub[h.subject]=(sub[h.subject]||0)+(h.duration||0));
   const subEl=document.getElementById('msubs');
-  if(!Object.keys(sub).length){subEl.innerHTML='<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;padding:8px;">NO STUDY DATA YET</div>';return;}
-  const mx=Math.max(...Object.values(sub),1);
-  subEl.innerHTML=Object.entries(sub).sort((a,b)=>b[1]-a[1]).map(([s,t])=>
-    `<div class="br"><div class="bn">${s}</div><div class="bw"><div class="bf" style="width:${Math.round(t/mx*100)}%"></div></div><div class="bt">${fmtM(t)}</div></div>`
-  ).join('');
-  // workout
+  if(!Object.keys(sub).length){subEl.innerHTML='<div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;padding:8px;">NO STUDY DATA YET</div>';}
+  else{
+    const mx=Math.max(...Object.values(sub),1);
+    subEl.innerHTML=Object.entries(sub).sort((a,b)=>b[1]-a[1]).map(([s,t])=>
+      `<div class="br"><div class="bn">${s}</div><div class="bw"><div class="bf" style="width:${Math.round(t/mx*100)}%"></div></div><div class="bt">${fmtM(t)}</div></div>`
+    ).join('');
+  }
+
   const wEl=document.getElementById('mwo');
   const isWD=WODAYS.includes(twDate().getDay());
   if(!isWD){wEl.innerHTML='<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;letter-spacing:1px;">REST DAY 💤</div>';return;}
@@ -293,7 +339,7 @@ function renderHist(){
   if(!S.history.length){el.innerHTML='<div class="nodata">[ NO HISTORY YET ]</div>';return;}
   const g={};S.history.slice(0,60).forEach(h=>{if(!g[h.date])g[h.date]=[];g[h.date].push(h);});
   el.innerHTML=Object.entries(g).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>
-    `<div class="hgl">// ${date}</div>${items.map(h=>`<div class="hi"><div class="ht"><div class="htitle">${esc(h.title)}</div><div class="hsub">${h.subject}</div></div><div class="hd">${fmt(h.duration||0)}</div></div>`).join('')}`
+    `<div class="hgl">// ${date}</div>${items.map(h=>`<div class="hi"><div class="ht"><div class="htitle">${esc(h.title)}</div><div class="hsub">${h.subject}</div></div><div class="hdur">${fmt(h.duration||0)}</div></div>`).join('')}`
   ).join('');
 }
 
@@ -310,8 +356,8 @@ function swpg(name,btn){
   btn.classList.add('active');
 }
 
+function fmt(s,long=false){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;if(long||h>0)return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function fmtM(s){const m=Math.floor(s/60);return m>=60?`${(m/60).toFixed(1)}h`:`${m}m`;}
-function fmt(s){const m=Math.floor(s/60),sec=s%60;return s>=3600?`${Math.floor(s/3600)}h${String(m%60).padStart(2,'0')}m`:`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 window.addEventListener('load',()=>{
