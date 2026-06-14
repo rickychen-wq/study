@@ -610,22 +610,35 @@ function renderTodos(){
 async function togD(id){const t=S.todos.find(x=>x.id===id);if(!t)return;if(aId===id)await stopT();t.done=!t.done;await saveT(t);okS();renderTodos();renderRight();renderStats();}
 async function rmTodo(id){if(aId===id)await stopT();S.todos=S.todos.filter(x=>x.id!==id);await delT(id);renderTodos();renderRight();}
 
-let aStartSec=0; // 這次 session 開始時的 elapsed
+let sessionSec=0; // 這次 session 純累計秒（暫停時不增加）
 function startT(id){
-  if(aTimer)stopT();aId=id;const t=S.todos.find(x=>x.id===id);
-  aSec=t.elapsed||0;aStartSec=aSec;aPaused=false;
+  if(aTimer)stopT();
+  aId=id;const t=S.todos.find(x=>x.id===id);
+  aSec=t.elapsed||0; // 顯示用（含歷史）
+  sessionSec=0;      // 這次 session 從 0 開始累計
+  aPaused=false;
   document.getElementById('atimer').style.display='block';
   document.getElementById('atnm').textContent=`${t.subject} — ${t.title}`;
   document.getElementById('pbtn').textContent='⏸ PAUSE';
-  aTimer=setInterval(()=>{if(!aPaused){aSec++;document.getElementById('atdisp').textContent=fmt(aSec,true);}},1000);
+  aTimer=setInterval(()=>{
+    if(!aPaused){
+      aSec++;
+      sessionSec++; // 只在非暫停時累加
+      document.getElementById('atdisp').textContent=fmt(aSec,true);
+    }
+  },1000);
   renderTodos();
 }
 async function stopT(){
   if(!aTimer)return;clearInterval(aTimer);aTimer=null;
   const t=S.todos.find(x=>x.id===aId);
-  const sessionDur=aSec-aStartSec; // 只記這次新增的時間
-  if(t&&sessionDur>5){t.elapsed=aSec;await saveT(t);await saveH({taskId:t.id,title:t.title,subject:t.subject,duration:sessionDur,date:dkey(),timestamp:Date.now()});}
-  aId=null;aSec=0;aStartSec=0;document.getElementById('atimer').style.display='none';document.getElementById('atdisp').textContent='00:00:00';
+  if(t&&sessionSec>5){
+    t.elapsed=aSec;
+    await saveT(t);
+    await saveH({taskId:t.id,title:t.title,subject:t.subject,duration:sessionSec,date:dkey(),timestamp:Date.now()});
+  }
+  aId=null;aSec=0;sessionSec=0;
+  document.getElementById('atimer').style.display='none';document.getElementById('atdisp').textContent='00:00:00';
   renderTodos();renderRight();renderStats();renderHist();
 }
 function pauseT(){aPaused=!aPaused;document.getElementById('pbtn').textContent=aPaused?'▶ RESUME':'⏸ PAUSE';}
